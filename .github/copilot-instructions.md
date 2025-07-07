@@ -1,11 +1,11 @@
-# GitHub Copilot Instructions for `task-master-issues` Repository
+# GitHub Copilot Instructions for `task-master-issues-copilot-2` Repository
 
-Welcome to the `task-master-issues` repository! This document provides guidance for using GitHub Copilot effectively within this project.
+Welcome to the `task-master-issues-copilot-2` repository! This document provides guidance for using GitHub Copilot effectively within this project.
 
 ## General Guidance
 
 - **Scope Your Work:**  
-  Always scope your code suggestions, completions, and pull requests strictly to the issue or task at hand. Avoid making unrelated or speculative changes.
+  Always scope your code suggestions, completions, and commits strictly to the issue or task at hand. Avoid making unrelated or speculative changes.
 
 - **Leverage Project Context:**  
   Copilot can and should reference the following key files to inform its suggestions:
@@ -29,6 +29,8 @@ Welcome to the `task-master-issues` repository! This document provides guidance 
   Do not modify files, functions, or logic unrelated to the specific issue you are addressing.
 - **Use Context Files Wisely:**  
   Reference `tasks.json` and the PRD for understanding requirements, but only extract the information relevant to your current task.
+- **Work Step By Step:**
+  Utilize the task-master-ai MCP tools to get next steps and mark completion or tasks. This will help you focus on one aspect of the task at a time.
 - **Documentation:**  
   When adding or modifying features, update relevant documentation and comments for clarity.
 - **Testing:**  
@@ -36,13 +38,15 @@ Welcome to the `task-master-issues` repository! This document provides guidance 
 
 ## Example Workflow
 
-1. **Read the Issue:**  
-   Fully understand the problem or feature request.
+1. **Get the next task:**  
+   Using the task-master-ai MCP tools, retrieve the next task you should work on.
 2. **Consult `tasks.json` and PRD:**  
    Use these files to clarify requirements or dependencies.
 3. **Implement the Solution:**  
    Write clear, maintainable TypeScript code scoped to the issue.
 4. **Test and Document:**  
    Ensure your changes are covered by tests and documented as necessary.
-5. **Submit a Focused Pull Request:**  
-   Your PR should only resolve the current issue, with a clear summary.
+5. **Complete the Task:**  
+   Commit your work, mark the task as complete using the MCP tools, and push your changes.
+6. **Repeat:**  
+   Start the process again for the next task.

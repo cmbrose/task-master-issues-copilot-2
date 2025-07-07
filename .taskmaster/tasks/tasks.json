@@ -1,0 +1,653 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Repository Structure and Configuration",
+        "description": "Initialize the GitHub Action template repository with proper directory structure, configuration files, and basic workflow scaffolding",
+        "details": "Create .github/workflows/ directory structure, initialize action.yml metadata file with inputs (complexity-threshold: 40, max-depth: 3, prd-path-glob: docs/**.prd.md, breakdown-max-depth: 2, taskmaster-args), setup composite action structure with required permissions (issues: write, contents: read), and create initial README with usage instructions",
+        "testStrategy": "Verify repository structure matches expected layout, validate action.yml syntax with GitHub Actions CLI, confirm all required inputs are properly defined with correct defaults",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create directory structure",
+            "description": "Set up the basic directory structure for the GitHub Actions repository including necessary folders and placeholder files",
+            "dependencies": [],
+            "details": "Create root directory structure with appropriate folders for actions, scripts, and configuration files",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Setup action.yml metadata",
+            "description": "Create and configure the action.yml file with proper metadata, inputs, outputs, and basic action definition",
+            "dependencies": [
+              1
+            ],
+            "details": "Define action metadata including name, description, author, inputs, outputs, and branding information",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Configure composite action",
+            "description": "Implement the composite action configuration with step definitions and shell commands",
+            "dependencies": [
+              2
+            ],
+            "details": "Set up composite action runs configuration with proper steps, shell commands, and input/output handling",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Create initial documentation",
+            "description": "Generate basic README and documentation files explaining the action's purpose, usage, and configuration",
+            "dependencies": [
+              3
+            ],
+            "details": "Create README.md with usage examples, input/output documentation, and basic setup instructions",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Implement Taskmaster CLI Integration",
+        "description": "Integrate pinned Taskmaster CLI binary for PRD parsing and task graph generation",
+        "details": "Download and pin specific version of Taskmaster CLI binary with checksum validation, create wrapper script for CLI invocation with configurable arguments, implement complexity threshold (≤40 default) and max-depth (3 default) controls, ensure deterministic output to task-graph.json format",
+        "testStrategy": "Test CLI integration with sample PRD files, verify complexity threshold filtering works correctly, validate task graph JSON structure matches expected schema, confirm binary checksum validation prevents tampering",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Binary download and pinning",
+            "description": "Implement functionality to download CLI binary from specified source and pin to specific version",
+            "dependencies": [],
+            "details": "Create module to handle downloading CLI binary from remote source, implement version pinning mechanism, handle different architectures and operating systems, manage binary storage location",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Checksum validation",
+            "description": "Implement security validation of downloaded binary using checksums",
+            "dependencies": [
+              1
+            ],
+            "details": "Add checksum verification against known good values, support multiple hash algorithms (SHA256, SHA512), implement secure checksum retrieval and comparison, handle checksum mismatch scenarios",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Wrapper script creation",
+            "description": "Create wrapper script to interface with the CLI binary",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Generate platform-specific wrapper scripts, handle PATH management, implement binary execution wrapper, manage environment variable passing, handle script permissions and execution",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Configuration parameter handling",
+            "description": "Implement system for managing CLI configuration parameters",
+            "dependencies": [
+              3
+            ],
+            "details": "Create configuration file management, implement parameter validation and sanitization, handle default values and overrides, support environment variable configuration, manage configuration persistence",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Output format validation",
+            "description": "Implement validation and parsing of CLI output formats",
+            "dependencies": [
+              4
+            ],
+            "details": "Parse and validate CLI output formats (JSON, XML, plain text), implement output format conversion, handle parsing errors and malformed output, create output sanitization and validation rules",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Build Main Task Generation Workflow",
+        "description": "Create the primary workflow that triggers on PRD commits and generates GitHub Issues from task graphs",
+        "details": "Implement taskmaster-generate.yml workflow triggered on push to docs/**.prd.md (configurable glob), checkout repository, run Taskmaster CLI on changed PRDs, parse generated task-graph.json, create/update GitHub Issues with YAML front-matter (id, parent, dependents), apply 'task' and 'blocked' labels, use Sub-issues REST API for hierarchy linking, handle rate limiting with exponential backoff",
+        "testStrategy": "Test workflow triggers correctly on PRD file changes, verify Issues are created with proper YAML front-matter and labels, confirm Sub-issues API integration works, validate idempotency (no duplicate Issues on re-run)",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Trigger Configuration",
+            "description": "Configure GitHub Actions workflow triggers including manual dispatch, schedule, and webhook events",
+            "dependencies": [],
+            "details": "Set up workflow_dispatch with input parameters, schedule triggers for automated runs, and configure repository event triggers. Include input validation and parameter handling.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Repository Checkout",
+            "description": "Implement secure repository checkout with proper authentication and access controls",
+            "dependencies": [
+              1
+            ],
+            "details": "Configure actions/checkout with appropriate permissions, handle private repositories, set up SSH keys or tokens as needed, and ensure proper workspace preparation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "CLI Execution",
+            "description": "Execute task master CLI with proper error handling and output capture",
+            "dependencies": [
+              2
+            ],
+            "details": "Install CLI dependencies, run task breakdown commands with appropriate parameters, handle execution errors, capture stdout/stderr, and implement timeout controls.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "JSON Parsing",
+            "description": "Parse and validate CLI output JSON with error handling and schema validation",
+            "dependencies": [
+              3
+            ],
+            "details": "Parse JSON output from CLI, validate against expected schema, handle malformed JSON gracefully, extract task data, and prepare for GitHub API consumption.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "GitHub Issues Creation",
+            "description": "Create GitHub issues with rate limiting, deduplication, and error handling",
+            "dependencies": [
+              4
+            ],
+            "details": "Implement GitHub API integration with authentication, create issues with proper formatting, handle rate limiting and API errors, implement idempotency checks, and manage concurrent requests.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Label and Hierarchy Management",
+            "description": "Apply labels, manage task dependencies, and establish issue hierarchy",
+            "dependencies": [
+              5
+            ],
+            "details": "Create and apply appropriate labels, establish parent-child relationships between issues, handle dependency mapping, implement priority ordering, and ensure consistent labeling across related tasks.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Implement Issue Hierarchy and Dependency Management",
+        "description": "Create system for managing issue dependencies and hierarchical relationships using GitHub's Sub-issues API",
+        "details": "Implement Sub-issues REST API integration for creating parent-child relationships, add dependency tracking through YAML front-matter in issue descriptions, create logic to determine blocked status based on open dependencies, implement dependency resolution when parent issues are closed, ensure proper error handling when Sub-issues API is unavailable",
+        "testStrategy": "Create test scenarios with complex dependency chains, verify Sub-issues API calls succeed, test blocked/unblocked state transitions, validate dependency resolution on issue closure",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Sub-issues API integration",
+            "description": "Implement GitHub API integration to fetch and manage sub-issues for parent issues",
+            "dependencies": [],
+            "details": "Create API client methods to retrieve sub-issues, handle authentication, manage rate limits, and process GitHub issue relationships",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "YAML front-matter parsing",
+            "description": "Implement parsing logic for YAML front-matter in issue descriptions to extract metadata",
+            "dependencies": [],
+            "details": "Create parser to extract structured data from issue descriptions including dependencies, priority, and other metadata fields",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Dependency tracking logic",
+            "description": "Build dependency graph management system to track relationships between issues",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement graph data structure to represent issue dependencies, detect cycles, and manage dependency resolution order",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Blocked status management",
+            "description": "Implement automatic status updates for blocked issues based on dependency states",
+            "dependencies": [
+              3
+            ],
+            "details": "Create logic to automatically mark issues as blocked when dependencies are unresolved and unblock when dependencies are completed",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Error handling for API failures",
+            "description": "Implement comprehensive error handling for GitHub API integration failures",
+            "dependencies": [
+              1
+            ],
+            "details": "Add retry logic, fallback mechanisms, error logging, and graceful degradation for API rate limits, network issues, and authentication failures",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Build Artifact Upload and Storage System",
+        "description": "Implement durable artifact storage for task graphs to enable replay and recovery workflows",
+        "details": "Upload task-graph.json to GitHub Actions artifacts at artifacts/taskmaster/task-graph.json path, implement artifact retention policies, create artifact metadata with PRD source, task count, and generation timestamp, ensure artifacts are accessible for replay workflows, add structured logging for artifact operations",
+        "testStrategy": "Verify artifacts are uploaded correctly after each workflow run, test artifact download and parsing, validate artifact metadata completeness, confirm retention policies work as expected",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement GitHub Actions artifact upload with structured metadata",
+            "description": "Create artifact upload functionality that uploads task-graph.json with structured metadata including task complexity scores, hierarchy depth, PRD version, and generation timestamp. Implement proper error handling and validation for artifact creation.",
+            "dependencies": [],
+            "details": "Use GitHub Actions toolkit (@actions/artifact) to upload task-graph.json with metadata fields: prd_version, generation_timestamp, complexity_threshold, max_depth, total_tasks, leaf_tasks_count, and task_hierarchy_depth. Include structured logging for upload success/failure and artifact size validation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Configure artifact retention policies and cleanup automation",
+            "description": "Implement configurable retention policies for task graph artifacts with automatic cleanup of expired artifacts. Support both time-based and count-based retention strategies with proper workflow integration.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create retention configuration inputs (max_artifacts_count, retention_days) with defaults. Implement cleanup workflow that runs on schedule to remove expired artifacts while preserving the most recent successful runs. Add metadata tracking for artifact age and usage patterns.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Develop metadata management system with artifact recovery workflow",
+            "description": "Build comprehensive metadata management for artifact tracking and implement the replay workflow that can reconstruct task graphs from stored artifacts. Include artifact discovery, validation, and restoration capabilities.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create metadata schema for artifact indexing with fields for PRD hash, task counts, dependency chains, and workflow run context. Implement taskgraph-replay.yml workflow that accepts artifact URL/ID and recreates Issues idempotently. Add artifact search and validation utilities with structured logging throughout the process.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Create Dependency Watcher Workflow",
+        "description": "Implement automated system to remove 'blocked' labels when dependencies are resolved",
+        "details": "Create taskmaster-watcher.yml workflow triggered by issues.closed webhook and cron schedule (*/10 * * * *), implement logic to scan dependent issues when a task is closed, automatically remove 'blocked' labels from unblocked issues, add batch processing for efficiency, ensure median blocked→unblocked latency < 15 minutes",
+        "testStrategy": "Test webhook triggers on issue closure, verify cron schedule executes correctly, validate blocked label removal logic, measure and confirm latency requirements are met",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Webhook trigger setup",
+            "description": "Configure GitHub webhook triggers for PRD commits and issue comment events to initiate task breakdown workflows",
+            "dependencies": [],
+            "details": "Set up webhook listeners for push events on docs/**.prd.md files and issue_comment events for /breakdown commands. Configure proper event filtering and payload handling to trigger appropriate workflows.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Cron scheduling implementation",
+            "description": "Implement 10-minute cron job for dependency scanning and blocked label management",
+            "dependencies": [],
+            "details": "Create scheduled workflow that runs every 10 minutes to scan for closed issues and automatically remove 'blocked' labels from dependent tasks. Ensure proper error handling and rate limiting.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Dependency scanning logic",
+            "description": "Build dependency graph traversal and blocked task detection system",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement logic to parse task dependencies from YAML front-matter, maintain dependency graphs, and automatically detect when tasks become unblocked. Handle sub-issue relationships and parent-child task hierarchies.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Batch processing optimization",
+            "description": "Optimize GitHub API calls and implement batch processing for large task graphs",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement batching strategies for GitHub API calls to handle rate limits, add retry logic for failed operations, and optimize performance for large PRDs with 500+ tasks. Include artifact upload and replay capabilities.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Implement Manual Breakdown Command System",
+        "description": "Create slash-command system for on-demand task breakdown via issue comments",
+        "details": "Create taskmaster-breakdown.yml workflow triggered by issue_comment containing '/breakdown', parse command arguments (--depth N, --threshold X), fetch parent issue YAML metadata, run Taskmaster CLI on specific node, create sub-issues and link via Sub-issues API, close or convert parent issue, add thumbs-up reaction on completion, respect breakdown-max-depth limit (default 2), ensure idempotency",
+        "testStrategy": "Test slash-command parsing and argument validation, verify sub-task creation and linking, confirm parent issue state transitions, validate idempotency (no duplicates on re-run), test completion reaction",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Comment Parsing",
+            "description": "Implement parsing logic to extract commands and parameters from issue comments",
+            "dependencies": [],
+            "details": "Parse issue comments to identify valid commands, extract parameters, and handle different comment formats and edge cases",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Command Argument Validation",
+            "description": "Validate parsed command arguments against expected schemas and formats",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement validation rules for command arguments, check parameter types, required fields, and provide meaningful error messages for invalid inputs",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Metadata Extraction",
+            "description": "Extract relevant metadata from issues and comments for processing",
+            "dependencies": [
+              1
+            ],
+            "details": "Extract issue metadata such as labels, assignees, project information, and comment context needed for command execution",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "CLI Execution",
+            "description": "Execute validated commands through CLI interface with proper error handling",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Implement CLI command execution with proper argument passing, error handling, output capture, and timeout management",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Sub-issue Creation",
+            "description": "Create sub-issues based on command results and extracted metadata",
+            "dependencies": [
+              4
+            ],
+            "details": "Generate sub-issues with appropriate titles, descriptions, labels, and relationships to parent issues based on CLI execution results",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Parent Issue State Management",
+            "description": "Update parent issue state and relationships after sub-issue creation",
+            "dependencies": [
+              5
+            ],
+            "details": "Update parent issue status, add tracking labels, create issue relationships, and maintain state consistency across the issue hierarchy",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Build Recovery and Replay Workflow",
+        "description": "Implement recovery workflow for handling failed runs and artifact-based replay functionality",
+        "details": "Create taskgraph-replay.yml workflow accepting artifact URL as input, download and parse task-graph.json from artifact, implement idempotent issue creation (no duplicates), add recovery logic for rate-limit failures, ensure replay workflow can complete partial graphs, add comprehensive error handling and logging",
+        "testStrategy": "Test replay workflow with various failure scenarios, verify idempotency during recovery, validate artifact URL parsing and download, confirm rate-limit recovery mechanisms work correctly",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement artifact download and validation system",
+            "description": "Create robust artifact download mechanism with checksum validation, signature verification, and structured metadata handling for task-graph.json artifacts",
+            "dependencies": [],
+            "details": "Build download service that fetches artifacts from GitHub Actions API, validates integrity using checksums, verifies signatures for security, and parses metadata. Include timeout handling and retry logic for network failures.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Design idempotency framework with state tracking",
+            "description": "Implement comprehensive idempotency logic using content hashing, state persistence, and change detection to prevent duplicate Issue creation and unnecessary API calls",
+            "dependencies": [
+              1
+            ],
+            "details": "Create state management system that tracks processed PRDs, generated Issues, and dependency relationships. Use content hashing to detect changes, implement transaction-like operations, and ensure replay operations are safe and consistent.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Build rate-limit recovery and exponential backoff system",
+            "description": "Implement intelligent rate-limit detection, exponential backoff strategies, and queue management for GitHub API operations with automatic recovery mechanisms",
+            "dependencies": [
+              1
+            ],
+            "details": "Create rate-limit monitoring that detects 429 responses, implements exponential backoff with jitter, queues operations during rate-limit periods, and automatically resumes processing. Include circuit breaker patterns for API failures.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Develop comprehensive error handling and recovery workflows",
+            "description": "Create multi-layered error handling system with categorized error types, recovery strategies, rollback mechanisms, and detailed logging for debugging and monitoring",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Implement error categorization (transient vs permanent), automatic retry logic for recoverable errors, rollback mechanisms for partial failures, structured logging with correlation IDs, and integration with the replay workflow for manual recovery operations.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Add Dry-Run and Preview Functionality",
+        "description": "Implement dry-run mode for pull requests that shows task graph preview without creating issues",
+        "details": "Extend main workflow to detect pull_request triggers, implement dry-run mode that generates task graph without creating Issues, post preview comment showing would-be-created task structure, format comment with markdown for readability, ensure dry-run doesn't affect repository state, add toggle for enabling/disabling dry-run feature",
+        "testStrategy": "Test dry-run triggers on pull requests, verify no Issues are created during dry-run, validate preview comment format and content, confirm repository state remains unchanged",
+        "priority": "low",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Pull Request Trigger Detection",
+            "description": "Implement workflow trigger detection for pull requests targeting PRD files to enable dry-run mode",
+            "dependencies": [],
+            "details": "Create GitHub workflow configuration to detect pull_request events that modify docs/**.prd.md files (configurable via prd-path-glob). Set up conditional logic to differentiate between push events (full execution) and pull_request events (dry-run mode). Configure workflow inputs and environment variables needed for dry-run detection.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Dry-Run Mode Implementation",
+            "description": "Implement dry-run execution logic that processes PRD files without creating actual GitHub Issues",
+            "dependencies": [
+              1
+            ],
+            "details": "Modify the taskmaster-generate workflow to support dry-run mode when triggered by pull_request events. Process PRD files through Taskmaster CLI to generate task graph without creating/patching Issues. Store the generated task graph data structure for preview generation. Ensure all API calls are skipped or mocked during dry-run execution.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Preview Comment Generation with Markdown Formatting",
+            "description": "Generate formatted markdown preview comments showing the task graph that would be created",
+            "dependencies": [
+              2
+            ],
+            "details": "Create markdown formatter to convert task graph JSON into human-readable preview format. Include task hierarchy, dependencies, complexity scores, and blocked/unblocked status. Format as collapsible sections with proper GitHub markdown syntax. Post the formatted preview as a comment on the pull request using GitHub API, replacing any existing preview comments to avoid spam.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Implement Comprehensive Testing and Documentation",
+        "description": "Create full test suite, performance validation, and complete documentation for the GitHub Action template",
+        "details": "Create comprehensive test suite covering all workflows and edge cases, implement performance tests to validate 5-minute runtime requirement for 1000-line PRDs, create detailed documentation including setup instructions, configuration options, troubleshooting guide, add example PRD files and expected outputs, implement CI/CD pipeline for testing the action itself, create smoke tests for Taskmaster CLI integration",
+        "testStrategy": "Run full test suite across multiple scenarios, validate performance benchmarks (5-min runtime, <500 tasks), test all configuration combinations, verify documentation completeness and accuracy, confirm CI/CD pipeline reliability",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Unit Test Suite Development",
+            "description": "Create comprehensive unit tests for all modules and components with high code coverage",
+            "dependencies": [],
+            "details": "Implement unit tests using appropriate testing framework, mock dependencies, test edge cases, and achieve minimum 90% code coverage",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Integration Testing Framework",
+            "description": "Design and implement integration tests for inter-module communication and data flow",
+            "dependencies": [
+              1
+            ],
+            "details": "Set up integration test environment, test API endpoints, database interactions, and service integrations",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Performance Validation Suite",
+            "description": "Develop performance benchmarks and load testing to validate system performance under various conditions",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create performance test scenarios, establish baseline metrics, implement load testing, and set up performance monitoring",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Documentation Creation",
+            "description": "Generate comprehensive technical documentation including API docs, user guides, and developer documentation",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Create API documentation, user manuals, code documentation, architecture diagrams, and deployment guides",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "CI/CD Pipeline Setup",
+            "description": "Implement automated continuous integration and deployment pipeline with quality gates",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Configure build automation, automated testing execution, code quality checks, and deployment strategies",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Smoke Testing Implementation",
+            "description": "Develop smoke tests for critical functionality validation in production environments",
+            "dependencies": [
+              1,
+              2,
+              5
+            ],
+            "details": "Create smoke test suite for post-deployment validation, health checks, and critical path verification",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-03T02:08:28.786Z",
+      "updated": "2025-07-03T02:08:28.786Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

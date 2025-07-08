@@ -1,0 +1,76 @@
+name: Task Graph Replay
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact-url:
+        description: 'URL of the task graph artifact to replay'
+        required: true
+      run-id:
+        description: 'Run ID containing the artifact (alternative to URL)'
+        required: false
+
+permissions:
+  issues: write
+  contents: read
+  actions: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    name: Replay Task Graph from Artifact
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Download artifact
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            let artifactUrl = '${{ github.event.inputs.artifact-url }}';
+            const runId = '${{ github.event.inputs.run-id }}';
+            
+            if (runId && !artifactUrl) {
+              // Get artifact from run ID
+              const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+                ...context.repo,
+                run_id: runId
+              });
+              
+              const taskGraphArtifact = artifacts.data.artifacts.find(
+                artifact => artifact.name === 'taskmaster-task-graph'
+              );
+              
+              if (!taskGraphArtifact) {
+                throw new Error('Task graph artifact not found in run');
+              }
+              
+              artifactUrl = taskGraphArtifact.archive_download_url;
+            }
+            
+            if (!artifactUrl) {
+              throw new Error('No artifact URL or run ID provided');
+            }
+            
+            console.log(`Downloading artifact from: ${artifactUrl}`);
+            
+            // Download and extract artifact
+            const download = await github.rest.actions.downloadArtifact({
+              ...context.repo,
+              artifact_id: taskGraphArtifact.id,
+              archive_format: 'zip'
+            });
+            
+            fs.writeFileSync('artifact.zip', Buffer.from(download.data));
+            
+            // Extract artifact (simplified - in real implementation would use proper zip extraction)
+            console.log('Artifact downloaded and ready for replay');
+      
+      - name: Replay task graph
+        uses: ./
+        with:
+          taskmaster-args: '--replay-mode --artifact-path artifact.zip'

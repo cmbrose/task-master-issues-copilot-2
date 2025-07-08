@@ -1,0 +1,90 @@
+name: 'Task-Planning GitHub Action'
+description: 'Automatically generate hierarchical task graphs from PRD files and create GitHub Issues with dependency management'
+author: 'Taskmaster Team'
+
+branding:
+  icon: 'list'
+  color: 'blue'
+
+inputs:
+  complexity-threshold:
+    description: 'Complexity threshold for task breakdown (default: 40)'
+    required: false
+    default: '40'
+  max-depth:
+    description: 'Maximum recursion depth for auto breakdown (default: 3)'
+    required: false
+    default: '3'
+  prd-path-glob:
+    description: 'POSIX glob pattern for PRD files (default: docs/**.prd.md)'
+    required: false
+    default: 'docs/**.prd.md'
+  breakdown-max-depth:
+    description: 'Maximum additional depth for manual breakdown (default: 2)'
+    required: false
+    default: '2'
+  taskmaster-args:
+    description: 'Additional arguments to pass to Taskmaster CLI'
+    required: false
+    default: ''
+
+outputs:
+  task-graph-path:
+    description: 'Path to the generated task graph JSON file'
+  issues-created:
+    description: 'Number of GitHub Issues created'
+  artifact-url:
+    description: 'URL of the uploaded task graph artifact'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        echo "::group::Validating inputs"
+        echo "Complexity threshold: ${{ inputs.complexity-threshold }}"
+        echo "Max depth: ${{ inputs.max-depth }}"
+        echo "PRD path glob: ${{ inputs.prd-path-glob }}"
+        echo "Breakdown max depth: ${{ inputs.breakdown-max-depth }}"
+        echo "Taskmaster args: ${{ inputs.taskmaster-args }}"
+        echo "::endgroup::"
+    
+    - name: Setup environment
+      shell: bash
+      run: |
+        echo "::group::Setting up environment"
+        mkdir -p artifacts/taskmaster
+        echo "Environment setup complete"
+        echo "::endgroup::"
+    
+    - name: Download and validate Taskmaster CLI
+      shell: bash
+      run: |
+        echo "::group::Downloading Taskmaster CLI"
+        # TODO: Implement CLI download and checksum validation
+        echo "Taskmaster CLI download placeholder"
+        echo "::endgroup::"
+    
+    - name: Generate task graph
+      shell: bash
+      run: |
+        echo "::group::Generating task graph"
+        # TODO: Implement task graph generation
+        echo "Task graph generation placeholder"
+        echo "::endgroup::"
+    
+    - name: Create GitHub Issues
+      shell: bash
+      run: |
+        echo "::group::Creating GitHub Issues"
+        # TODO: Implement GitHub Issues creation
+        echo "GitHub Issues creation placeholder"
+        echo "::endgroup::"
+    
+    - name: Upload task graph artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: taskmaster-task-graph
+        path: artifacts/taskmaster/
+        retention-days: 30

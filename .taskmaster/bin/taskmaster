@@ -1,0 +1,62 @@
+#!/bin/bash
+# Mock Taskmaster CLI for development
+echo "Mock Taskmaster CLI v0.19.0" >&2
+echo "Arguments: $*" >&2
+
+# Parse arguments to find output file
+output_file="task-graph.json"
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --output)
+            output_file="$2"
+            shift 2
+            ;;
+        --version)
+            echo "Mock Taskmaster CLI v0.19.0"
+            exit 0
+            ;;
+        --help)
+            echo "Mock Taskmaster CLI - Development Version"
+            echo "Commands: parse-prd, expand-task, validate"
+            exit 0
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+# Generate sample task graph JSON
+cat > "$output_file" << 'TASK_JSON'
+{
+  "version": "0.19.0",
+  "metadata": {
+    "prd_path": "docs/initial-release.prd.md",
+    "generated_at": "2025-07-08T01:45:00Z",
+    "complexity_threshold": 40,
+    "max_depth": 3
+  },
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Setup Repository Structure",
+      "description": "Initialize GitHub Action repository structure",
+      "complexity": 35,
+      "priority": "high",
+      "dependencies": [],
+      "subtasks": []
+    },
+    {
+      "id": "2", 
+      "title": "Implement CLI Integration",
+      "description": "Integrate Taskmaster CLI for PRD parsing",
+      "complexity": 45,
+      "priority": "high",
+      "dependencies": ["1"],
+      "subtasks": []
+    }
+  ]
+}
+TASK_JSON
+
+echo "Generated task graph: $output_file" >&2

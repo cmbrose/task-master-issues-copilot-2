@@ -1,0 +1,79 @@
+name: Manual Task Breakdown
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  contents: read
+  actions: read
+
+jobs:
+  breakdown:
+    runs-on: ubuntu-latest
+    name: Manual Task Breakdown
+    if: >
+      github.event.issue.state == 'open' &&
+      contains(github.event.comment.body, '/breakdown')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Parse breakdown command
+        id: parse-command
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = context.payload.comment.body;
+            const breakdownMatch = comment.match(/\/breakdown(?:\s+(.*))?/);
+            
+            if (!breakdownMatch) {
+              console.log('No /breakdown command found');
+              return;
+            }
+            
+            const args = breakdownMatch[1] || '';
+            
+            // Parse arguments
+            const depthMatch = args.match(/--depth\s+(\d+)/);
+            const thresholdMatch = args.match(/--threshold\s+(\d+)/);
+            
+            const depth = depthMatch ? depthMatch[1] : '2';
+            const threshold = thresholdMatch ? thresholdMatch[1] : '40';
+            
+            core.setOutput('depth', depth);
+            core.setOutput('threshold', threshold);
+            core.setOutput('issue_number', context.payload.issue.number);
+            
+            console.log(`Breakdown requested for issue #${context.payload.issue.number}`);
+            console.log(`Depth: ${depth}, Threshold: ${threshold}`);
+      
+      - name: React to comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+      
+      - name: Run breakdown
+        uses: ./
+        with:
+          complexity-threshold: ${{ steps.parse-command.outputs.threshold }}
+          max-depth: ${{ steps.parse-command.outputs.depth }}
+          breakdown-max-depth: ${{ steps.parse-command.outputs.depth }}
+          taskmaster-args: '--breakdown-mode --parent-issue ${{ steps.parse-command.outputs.issue_number }}'
+      
+      - name: React with success
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: context.payload.comment.id,
+              content: '+1'
+            });

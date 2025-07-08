@@ -1,0 +1,86 @@
+name: Dry Run Task Preview
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**.prd.md'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    name: Generate Task Preview
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run dry-run mode
+        uses: ./
+        id: dry-run
+        with:
+          taskmaster-args: '--dry-run --preview-mode'
+      
+      - name: Post preview comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const taskGraphPath = '${{ steps.dry-run.outputs.task-graph-path }}';
+            const fs = require('fs');
+            
+            let previewContent = '';
+            
+            if (fs.existsSync(taskGraphPath)) {
+              const taskGraph = JSON.parse(fs.readFileSync(taskGraphPath, 'utf8'));
+              
+              previewContent = `## 📋 Task Graph Preview\n\n`;
+              previewContent += `This PR would create **${taskGraph.tasks?.length || 0}** tasks.\n\n`;
+              
+              if (taskGraph.tasks && taskGraph.tasks.length > 0) {
+                previewContent += `### Task Breakdown:\n\n`;
+                for (const task of taskGraph.tasks.slice(0, 10)) { // Show first 10 tasks
+                  previewContent += `- **${task.title}** (ID: ${task.id})\n`;
+                  previewContent += `  - Complexity: ${task.complexity || 'N/A'}\n`;
+                  previewContent += `  - Dependencies: ${task.dependencies?.length || 0}\n\n`;
+                }
+                
+                if (taskGraph.tasks.length > 10) {
+                  previewContent += `... and ${taskGraph.tasks.length - 10} more tasks.\n\n`;
+                }
+              }
+            } else {
+              previewContent = `## 📋 Task Graph Preview\n\nNo task graph generated - check the action logs for details.\n\n`;
+            }
+            
+            previewContent += `> 🔍 This is a preview. Tasks will be created when this PR is merged to the main branch.\n`;
+            
+            // Find existing preview comment
+            const comments = await github.rest.issues.listComments({
+              ...context.repo,
+              issue_number: context.issue.number
+            });
+            
+            const existingComment = comments.data.find(
+              comment => comment.body.includes('📋 Task Graph Preview')
+            );
+            
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: existingComment.id,
+                body: previewContent
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body: previewContent
+              });
+            }

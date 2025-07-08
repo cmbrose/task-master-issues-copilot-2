@@ -1,0 +1,53 @@
+name: Generate Task Graph from PRD
+
+on:
+  push:
+    paths:
+      - 'docs/**.prd.md'
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      prd-path:
+        description: 'Path to PRD file to process'
+        required: false
+        default: ''
+      complexity-threshold:
+        description: 'Complexity threshold override'
+        required: false
+        default: '40'
+      max-depth:
+        description: 'Max depth override'
+        required: false
+        default: '3'
+
+permissions:
+  issues: write
+  contents: read
+  actions: read
+
+jobs:
+  generate-tasks:
+    runs-on: ubuntu-latest
+    name: Generate Task Graph and Create Issues
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Task Planning Action
+        uses: ./
+        id: task-planning
+        with:
+          complexity-threshold: ${{ github.event.inputs.complexity-threshold || '40' }}
+          max-depth: ${{ github.event.inputs.max-depth || '3' }}
+          prd-path-glob: ${{ github.event.inputs.prd-path || 'docs/**.prd.md' }}
+      
+      - name: Output results
+        run: |
+          echo "Task graph generated at: ${{ steps.task-planning.outputs.task-graph-path }}"
+          echo "Issues created: ${{ steps.task-planning.outputs.issues-created }}"
+          echo "Artifact URL: ${{ steps.task-planning.outputs.artifact-url }}"

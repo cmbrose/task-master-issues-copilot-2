@@ -1,0 +1,46 @@
+name: 'Taskmaster Replay'
+description: 'Replay task graph generation from uploaded artifacts'
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact-url:
+        description: 'URL of the task graph artifact to replay'
+        required: true
+      dry-run:
+        description: 'Run in preview mode without creating issues'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download artifact
+        shell: bash
+        run: |
+          echo "Downloading artifact from: ${{ github.event.inputs.artifact-url }}"
+          curl -L -o task-graph.json "${{ github.event.inputs.artifact-url }}"
+          
+          # Validate artifact
+          if ! jq empty task-graph.json 2>/dev/null; then
+            echo "Error: Invalid JSON in artifact"
+            exit 1
+          fi
+          
+          echo "Artifact downloaded and validated successfully"
+        
+      - name: Replay task generation
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          dry-run: ${{ github.event.inputs.dry-run }}
+          # Additional parameters will be extracted from the artifact

@@ -1,0 +1,67 @@
+name: 'Task Planning GitHub Action'
+description: 'Automatically generate GitHub Issues from PRD files using Taskmaster CLI'
+author: 'ChatGPT (with Caleb)'
+branding:
+  icon: 'list'
+  color: 'blue'
+
+inputs:
+  complexity-threshold:
+    description: 'Complexity score threshold for task breakdown (default: 40)'
+    required: false
+    default: '40'
+  max-depth:
+    description: 'Maximum depth for automatic task recursion (default: 3)'
+    required: false
+    default: '3'
+  prd-path-glob:
+    description: 'POSIX glob pattern for PRD file paths (default: docs/**.prd.md)'
+    required: false
+    default: 'docs/**.prd.md'
+  breakdown-max-depth:
+    description: 'Maximum additional depth for manual breakdown commands (default: 2)'
+    required: false
+    default: '2'
+  taskmaster-args:
+    description: 'Additional arguments to pass to Taskmaster CLI'
+    required: false
+    default: ''
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  dry-run:
+    description: 'Run in dry-run mode (preview only, no issues created)'
+    required: false
+    default: 'false'
+
+outputs:
+  task-count:
+    description: 'Number of tasks generated'
+  issues-created:
+    description: 'Number of GitHub issues created'
+  artifact-url:
+    description: 'URL of the uploaded task graph artifact'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Download and setup Taskmaster CLI'
+      shell: bash
+      run: |
+        echo "Setting up Taskmaster CLI..."
+        # This will be implemented in the next task
+        
+    - name: 'Process PRD files'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        COMPLEXITY_THRESHOLD: ${{ inputs.complexity-threshold }}
+        MAX_DEPTH: ${{ inputs.max-depth }}
+        PRD_PATH_GLOB: ${{ inputs.prd-path-glob }}
+        BREAKDOWN_MAX_DEPTH: ${{ inputs.breakdown-max-depth }}
+        TASKMASTER_ARGS: ${{ inputs.taskmaster-args }}
+        DRY_RUN: ${{ inputs.dry-run }}
+      run: |
+        echo "Processing PRD files..."
+        # This will be implemented in subsequent tasks

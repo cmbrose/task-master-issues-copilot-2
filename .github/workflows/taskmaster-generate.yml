@@ -1,0 +1,49 @@
+name: 'Taskmaster Generate'
+description: 'Generate GitHub Issues from PRD files'
+
+on:
+  push:
+    paths:
+      - 'docs/**.prd.md'
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      prd-path-glob:
+        description: 'POSIX glob pattern for PRD files'
+        required: false
+        default: 'docs/**.prd.md'
+      complexity-threshold:
+        description: 'Complexity threshold for task breakdown'
+        required: false
+        default: '40'
+      max-depth:
+        description: 'Maximum recursion depth'
+        required: false
+        default: '3'
+      dry-run:
+        description: 'Run in preview mode without creating issues'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  generate-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Generate task graph
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          complexity-threshold: ${{ github.event.inputs.complexity-threshold || '40' }}
+          max-depth: ${{ github.event.inputs.max-depth || '3' }}
+          prd-path-glob: ${{ github.event.inputs.prd-path-glob || 'docs/**.prd.md' }}
+          dry-run: ${{ github.event.inputs.dry-run || 'false' }}

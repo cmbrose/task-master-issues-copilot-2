@@ -1,0 +1,58 @@
+name: 'Taskmaster Breakdown'
+description: 'Handle manual breakdown commands via issue comments'
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  breakdown:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.issue.state == 'open' &&
+      contains(github.event.comment.body, '/breakdown')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Parse breakdown command
+        id: parse
+        shell: bash
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          echo "Processing comment: $COMMENT"
+          
+          # Extract depth parameter (default: 2)
+          DEPTH=$(echo "$COMMENT" | grep -oP '(?<=--depth\s)\d+' || echo "2")
+          echo "depth=$DEPTH" >> $GITHUB_OUTPUT
+          
+          # Extract threshold parameter (default: 40)
+          THRESHOLD=$(echo "$COMMENT" | grep -oP '(?<=--threshold\s)\d+' || echo "40")
+          echo "threshold=$THRESHOLD" >> $GITHUB_OUTPUT
+          
+          echo "Parsed depth: $DEPTH, threshold: $THRESHOLD"
+        
+      - name: Run breakdown
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          complexity-threshold: ${{ steps.parse.outputs.threshold }}
+          max-depth: ${{ steps.parse.outputs.depth }}
+          breakdown-max-depth: ${{ steps.parse.outputs.depth }}
+          
+      - name: React to comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: '+1'
+            });

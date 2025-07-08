@@ -41,9 +41,21 @@ jobs:
         
       - name: Generate task graph
         uses: ./
+        id: taskmaster
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           complexity-threshold: ${{ github.event.inputs.complexity-threshold || '40' }}
           max-depth: ${{ github.event.inputs.max-depth || '3' }}
           prd-path-glob: ${{ github.event.inputs.prd-path-glob || 'docs/**.prd.md' }}
           dry-run: ${{ github.event.inputs.dry-run || 'false' }}
+          
+      - name: Upload task graph artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskmaster-task-graph-${{ github.run_number }}
+          path: |
+            task-graph-*.json
+            /tmp/taskmaster-artifacts/
+          retention-days: 30
+          compression-level: 6

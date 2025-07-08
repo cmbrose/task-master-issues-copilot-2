@@ -211,7 +211,7 @@
         "dependencies": [
           3
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -219,7 +219,7 @@
             "description": "Implement GitHub API integration to fetch and manage sub-issues for parent issues",
             "dependencies": [],
             "details": "Create API client methods to retrieve sub-issues, handle authentication, manage rate limits, and process GitHub issue relationships",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -228,7 +228,7 @@
             "description": "Implement parsing logic for YAML front-matter in issue descriptions to extract metadata",
             "dependencies": [],
             "details": "Create parser to extract structured data from issue descriptions including dependencies, priority, and other metadata fields",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -240,7 +240,7 @@
               2
             ],
             "details": "Implement graph data structure to represent issue dependencies, detect cycles, and manage dependency resolution order",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -251,7 +251,7 @@
               3
             ],
             "details": "Create logic to automatically mark issues as blocked when dependencies are unresolved and unblock when dependencies are completed",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -262,7 +262,7 @@
               1
             ],
             "details": "Add retry logic, fallback mechanisms, error logging, and graceful degradation for API rate limits, network issues, and authentication failures",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           }
         ]
@@ -277,7 +277,7 @@
         "dependencies": [
           3
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -285,7 +285,7 @@
             "description": "Create artifact upload functionality that uploads task-graph.json with structured metadata including task complexity scores, hierarchy depth, PRD version, and generation timestamp. Implement proper error handling and validation for artifact creation.",
             "dependencies": [],
             "details": "Use GitHub Actions toolkit (@actions/artifact) to upload task-graph.json with metadata fields: prd_version, generation_timestamp, complexity_threshold, max_depth, total_tasks, leaf_tasks_count, and task_hierarchy_depth. Include structured logging for upload success/failure and artifact size validation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -296,7 +296,7 @@
               1
             ],
             "details": "Create retention configuration inputs (max_artifacts_count, retention_days) with defaults. Implement cleanup workflow that runs on schedule to remove expired artifacts while preserving the most recent successful runs. Add metadata tracking for artifact age and usage patterns.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -308,7 +308,7 @@
               2
             ],
             "details": "Create metadata schema for artifact indexing with fields for PRD hash, task counts, dependency chains, and workflow run context. Implement taskgraph-replay.yml workflow that accepts artifact URL/ID and recreates Issues idempotently. Add artifact search and validation utilities with structured logging throughout the process.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           }
         ]
@@ -323,7 +323,7 @@
         "dependencies": [
           4
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -331,7 +331,7 @@
             "description": "Configure GitHub webhook triggers for PRD commits and issue comment events to initiate task breakdown workflows",
             "dependencies": [],
             "details": "Set up webhook listeners for push events on docs/**.prd.md files and issue_comment events for /breakdown commands. Configure proper event filtering and payload handling to trigger appropriate workflows.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -340,7 +340,7 @@
             "description": "Implement 10-minute cron job for dependency scanning and blocked label management",
             "dependencies": [],
             "details": "Create scheduled workflow that runs every 10 minutes to scan for closed issues and automatically remove 'blocked' labels from dependent tasks. Ensure proper error handling and rate limiting.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -352,7 +352,7 @@
               2
             ],
             "details": "Implement logic to parse task dependencies from YAML front-matter, maintain dependency graphs, and automatically detect when tasks become unblocked. Handle sub-issue relationships and parent-child task hierarchies.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -363,7 +363,7 @@
               3
             ],
             "details": "Implement batching strategies for GitHub API calls to handle rate limits, add retry logic for failed operations, and optimize performance for large PRDs with 500+ tasks. Include artifact upload and replay capabilities.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           }
         ]
@@ -458,7 +458,7 @@
         "dependencies": [
           5
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -466,7 +466,7 @@
             "description": "Create robust artifact download mechanism with checksum validation, signature verification, and structured metadata handling for task-graph.json artifacts",
             "dependencies": [],
             "details": "Build download service that fetches artifacts from GitHub Actions API, validates integrity using checksums, verifies signatures for security, and parses metadata. Include timeout handling and retry logic for network failures.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -477,7 +477,7 @@
               1
             ],
             "details": "Create state management system that tracks processed PRDs, generated Issues, and dependency relationships. Use content hashing to detect changes, implement transaction-like operations, and ensure replay operations are safe and consistent.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -488,7 +488,7 @@
               1
             ],
             "details": "Create rate-limit monitoring that detects 429 responses, implements exponential backoff with jitter, queues operations during rate-limit periods, and automatically resumes processing. Include circuit breaker patterns for API failures.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -500,7 +500,7 @@
               3
             ],
             "details": "Implement error categorization (transient vs permanent), automatic retry logic for recoverable errors, rollback mechanisms for partial failures, structured logging with correlation IDs, and integration with the replay workflow for manual recovery operations.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           }
         ]
@@ -515,7 +515,7 @@
         "dependencies": [
           3
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -523,7 +523,7 @@
             "description": "Implement workflow trigger detection for pull requests targeting PRD files to enable dry-run mode",
             "dependencies": [],
             "details": "Create GitHub workflow configuration to detect pull_request events that modify docs/**.prd.md files (configurable via prd-path-glob). Set up conditional logic to differentiate between push events (full execution) and pull_request events (dry-run mode). Configure workflow inputs and environment variables needed for dry-run detection.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -534,7 +534,7 @@
               1
             ],
             "details": "Modify the taskmaster-generate workflow to support dry-run mode when triggered by pull_request events. Process PRD files through Taskmaster CLI to generate task graph without creating/patching Issues. Store the generated task graph data structure for preview generation. Ensure all API calls are skipped or mocked during dry-run execution.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -545,7 +545,7 @@
               2
             ],
             "details": "Create markdown formatter to convert task graph JSON into human-readable preview format. Include task hierarchy, dependencies, complexity scores, and blocked/unblocked status. Format as collapsible sections with proper GitHub markdown syntax. Post the formatted preview as a comment on the pull request using GitHub API, replacing any existing preview comments to avoid spam.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           }
         ]
@@ -568,7 +568,7 @@
           8,
           9
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -646,7 +646,7 @@
     ],
     "metadata": {
       "created": "2025-07-03T02:08:28.786Z",
-      "updated": "2025-07-08T01:57:00.044Z",
+      "updated": "2025-07-08T02:01:43.408Z",
       "description": "Tasks for master context"
     }
   }

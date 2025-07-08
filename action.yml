@@ -133,6 +133,10 @@ runs:
                   ${{ github.action_path }}/scripts/hierarchy-manager.sh process "$output_file"
                   
                   echo "Issue creation and hierarchy setup completed"
+                  
+                  # Upload artifact
+                  echo "Uploading task graph artifact..."
+                  ${{ github.action_path }}/scripts/artifact-manager.sh upload "$output_file"
                 else
                   echo "Error: Failed to create GitHub Issues"
                   exit 1

@@ -1,0 +1,87 @@
+name: 'Taskmaster Replay'
+description: 'Replay task graph generation from uploaded artifacts'
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact-name:
+        description: 'Name of the task graph artifact to replay'
+        required: true
+        default: 'taskmaster-task-graph'
+      dry-run:
+        description: 'Run in preview mode without creating issues'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.inputs.artifact-name || 'taskmaster-task-graph' }}
+          path: ./artifacts/
+        
+      - name: Validate and process artifact
+        shell: bash
+        run: |
+          echo "Processing downloaded artifact..."
+          
+          # Find the task graph file
+          TASK_GRAPH_FILE=$(find ./artifacts/ -name "task-graph*.json" -type f | head -1)
+          METADATA_FILE=$(find ./artifacts/ -name "metadata.json" -type f | head -1)
+          
+          if [[ -z "$TASK_GRAPH_FILE" ]]; then
+            echo "Error: No task graph file found in artifact"
+            exit 1
+          fi
+          
+          echo "Found task graph file: $TASK_GRAPH_FILE"
+          
+          # Validate the task graph
+          ./scripts/output-processor.sh validate "$TASK_GRAPH_FILE" taskgraph
+          
+          # Process metadata if available
+          if [[ -n "$METADATA_FILE" && -f "$METADATA_FILE" ]]; then
+            echo "Found metadata file: $METADATA_FILE"
+            echo "Artifact metadata:"
+            jq '.' "$METADATA_FILE"
+            
+            # Extract configuration from metadata
+            COMPLEXITY_THRESHOLD=$(jq -r '.configuration.complexity_threshold // 40' "$METADATA_FILE")
+            MAX_DEPTH=$(jq -r '.configuration.max_depth // 3' "$METADATA_FILE")
+            
+            echo "Using configuration from artifact metadata:"
+            echo "  Complexity threshold: $COMPLEXITY_THRESHOLD"
+            echo "  Max depth: $MAX_DEPTH"
+            
+            # Export for use in next step
+            echo "ARTIFACT_COMPLEXITY_THRESHOLD=$COMPLEXITY_THRESHOLD" >> $GITHUB_ENV
+            echo "ARTIFACT_MAX_DEPTH=$MAX_DEPTH" >> $GITHUB_ENV
+          else
+            echo "No metadata file found, using defaults"
+            echo "ARTIFACT_COMPLEXITY_THRESHOLD=40" >> $GITHUB_ENV
+            echo "ARTIFACT_MAX_DEPTH=3" >> $GITHUB_ENV
+          fi
+          
+          # Copy to expected location
+          cp "$TASK_GRAPH_FILE" task-graph-replay.json
+          
+          echo "Artifact validation completed"
+        
+      - name: Replay task generation
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          complexity-threshold: ${{ env.ARTIFACT_COMPLEXITY_THRESHOLD }}
+          max-depth: ${{ env.ARTIFACT_MAX_DEPTH }}
+          dry-run: ${{ github.event.inputs.dry-run }}

@@ -1,0 +1,14 @@
+{
+  "_comment": "Taskmaster Action Configuration",
+  "_generated": "2025-07-08T01:50:28Z",
+  "complexity_threshold": 40,
+  "max_depth": 3,
+  "breakdown_max_depth": 2,
+  "prd_path_glob": "docs/**.prd.md",
+  "output_format": "json",
+  "taskmaster_version": "v0.19.0",
+  "taskmaster_repo": "cmbrose/taskmaster",
+  "cache_enabled": true,
+  "validation_enabled": true,
+  "debug_mode": false
+}

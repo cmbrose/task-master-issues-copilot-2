@@ -23,6 +23,10 @@ Welcome to the `task-master-issues-copilot-2` repository! This document provides
   of users of the actions being built, users who are not familiar with the inner workings, when desiging interfaces for them to use.
   When code is needed, prefer using TypeScript, ensure all code suggestions follow TypeScript best practices, type definitions, and style conventions as seen in the existing codebase.
 
+- **Work to Completion:**
+  Do not exit work early if more tasks remain. Especially, do not get tripped up by sub-tasks within task-master-ai tasks. When you complete all sub-tasks within a task GO ON TO THE NEXT ONE.
+  Keep working and iterating until all work is done, rather than stopping when a task is complete.
+
 ## Specific Instructions
 
 - **Stay Focused:**  

@@ -1,0 +1,32 @@
+name: 'Taskmaster Dry Run'
+description: 'Preview task graph for PRD changes in pull requests'
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**.prd.md'
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Generate task preview
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          dry-run: 'true'
+          
+      - name: Comment preview on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // This will be implemented to post preview comments
+            console.log('Dry run completed - preview comment functionality to be implemented')

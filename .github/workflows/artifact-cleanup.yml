@@ -1,0 +1,110 @@
+name: 'Artifact Cleanup'
+description: 'Clean up old taskmaster artifacts based on retention policies'
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      max-artifacts:
+        description: 'Maximum number of artifacts to keep (default: 10)'
+        required: false
+        default: '10'
+      retention-days:
+        description: 'Maximum age of artifacts in days (default: 30)'
+        required: false
+        default: '30'
+      dry-run:
+        description: 'Preview what would be deleted without actually deleting'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup old artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const maxArtifacts = parseInt('${{ github.event.inputs.max-artifacts || '10' }}');
+            const retentionDays = parseInt('${{ github.event.inputs.retention-days || '30' }}');
+            const dryRun = '${{ github.event.inputs.dry-run || 'false' }}' === 'true';
+            
+            console.log(`Artifact cleanup configuration:`);
+            console.log(`  Max artifacts: ${maxArtifacts}`);
+            console.log(`  Retention days: ${retentionDays}`);
+            console.log(`  Dry run: ${dryRun}`);
+            
+            // Get all artifacts for the repository
+            const { data: artifacts } = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            // Filter for taskmaster artifacts
+            const taskmasterArtifacts = artifacts.artifacts.filter(artifact => 
+              artifact.name.startsWith('taskmaster-')
+            );
+            
+            console.log(`Found ${taskmasterArtifacts.length} taskmaster artifacts`);
+            
+            if (taskmasterArtifacts.length === 0) {
+              console.log('No taskmaster artifacts found to clean up');
+              return;
+            }
+            
+            // Sort by creation date (newest first)
+            taskmasterArtifacts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            
+            // Calculate cutoff date
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
+            
+            console.log(`Retention cutoff date: ${cutoffDate.toISOString()}`);
+            
+            let deletedCount = 0;
+            let preservedCount = 0;
+            
+            for (let i = 0; i < taskmasterArtifacts.length; i++) {
+              const artifact = taskmasterArtifacts[i];
+              const createdAt = new Date(artifact.created_at);
+              const shouldDelete = i >= maxArtifacts || createdAt < cutoffDate;
+              
+              if (shouldDelete) {
+                console.log(`${dryRun ? 'Would delete' : 'Deleting'} artifact: ${artifact.name} (created: ${artifact.created_at})`);
+                
+                if (!dryRun) {
+                  try {
+                    await github.rest.actions.deleteArtifact({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      artifact_id: artifact.id
+                    });
+                    deletedCount++;
+                  } catch (error) {
+                    console.error(`Failed to delete artifact ${artifact.name}: ${error.message}`);
+                  }
+                } else {
+                  deletedCount++;
+                }
+              } else {
+                console.log(`Preserving artifact: ${artifact.name} (created: ${artifact.created_at})`);
+                preservedCount++;
+              }
+            }
+            
+            console.log(`Cleanup completed:`);
+            console.log(`  ${dryRun ? 'Would delete' : 'Deleted'}: ${deletedCount} artifacts`);
+            console.log(`  Preserved: ${preservedCount} artifacts`);
+            
+            // Set outputs
+            core.setOutput('deleted-count', deletedCount);
+            core.setOutput('preserved-count', preservedCount);
+            core.setOutput('total-artifacts', taskmasterArtifacts.length);
